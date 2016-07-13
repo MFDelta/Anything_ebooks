@@ -1,0 +1,26 @@
+{
+  "name": "anything_ebooks",
+  "version": "0.0.1",
+  "description": "An app for generating _ebooks-style tweets from any source",
+  "manifest_version": 2,
+  
+  "icons": {
+     "48": "icon48.png"
+  },
+  "options_page": "main.html",
+  "background": {
+    "persistent": false,
+    "scripts": [
+      "codebird.js",
+	  "fly.js",
+      "background.js"
+    ]
+  },
+  "permissions": [
+    "https://api.twitter.com/*",
+    "alarms",
+    "background",
+    "notifications",
+    "storage"
+  ]
+}

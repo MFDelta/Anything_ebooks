@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html style="height:100%">
+<head>
+	<title>anything_ebooks</title>
+	<script src="main.js"></script>
+	<style>
+nav
+{
+	position:absolute;
+	top:0;
+	left:0;
+	bottom:56px;
+	min-width:56px;
+	
+	list-style:none;
+}
+.settingsNav
+{
+	top:auto;
+	bottom:0;
+}
+main
+{
+	background-color:white;
+	position:absolute;
+	top:0;
+	left:56px;
+	right:0;
+	bottom:0;
+}
+
+nav > li
+{
+	padding:4px;
+	width:48px;
+	height:48px;
+	border-radius:7px 0 0 7px;
+}
+nav > li > a > img
+{
+	width:48px;
+	height:48px;
+	border-radius:3px;
+}
+nav > li > a
+{
+	cursor:pointer;
+	display:block;
+	height:100%;
+}
+
+nav > li:hover
+{
+	background-color:lightgray;
+}
+nav > li.selected
+{
+	background-color:white;
+}
+
+#botScreenName {color:gray;}
+
+main > section
+{
+	padding:0px 32px 56px;
+}
+
+section > div
+{
+	margin:0.65em 0;
+}
+
+.pulse
+{
+	animation:pulse 0.5s ease-in-out alternate infinite;
+}
+
+@keyframes pulse
+{
+	from {opacity:1}
+	to {opacity:0}
+}
+
+dialog ul
+{
+	max-height: 512px;
+	overflow-y: scroll;
+}
+
+	</style>
+</head>
+<body style="margin:0;height:100%;font-family:sans-serif;background-color:gray">
+	<dialog id="authNewUserDialog">
+		<form id="authNewUserForm" method="dialog">
+			<input type="hidden" name="token">
+			<input type="hidden" name="secret">
+			<input type="text" name="pin">
+			<button type="submit" name="ok" value="ok">OK</button>
+			
+		</form>
+	</dialog>
+	<dialog id="sourceManagerDialog">
+		<form method="dialog">
+			<ul id="sourceList"></ul>
+			<button type="button" id="addSource" tabindex="1">Add</button>
+			<button type="button" id="deleteSources">Delete</button>
+			<button type="submit">Close</button>
+		</form>
+	</dialog>
+	<dialog id="sourceEditDialog">
+		<form id="sourceEditForm" method="dialog">
+			<input type="hidden" name="id">
+			<input type="text" name="name" autocomplete="off" style="width:256px">
+			<br>
+			<textarea name="text" style="width:256px;height:128px"></textarea>
+			<br>
+			<button type="submit" value="ok">OK</button>
+			<button type="submit" value="cancel">Cancel</button>
+		</form>
+	</dialog>
+	<dialog id="queueManagerDialog">
+		<form method="dialog">
+			<ul id="tweetList"></ul>
+			<button type="button" id="addTweets" tabindex="1">Add</button>
+			<button type="button" id="deleteTweets">Delete</button>
+			<button type="submit">Close</button>
+		</form>
+	</dialog>
+	<dialog id="tweetGeneratorDialog">
+		<form method="dialog">
+			<ul id="generatedTweets"></ul>
+			<button type="submit" value="continue">+Continue</button>
+			<button type="submit" value="quit">+Quit</button>
+		</form>
+	</dialog>
+	<dialog id="loadingDialog">Loading...</dialog>
+	<nav id="botsNav"><li id="tab_add"><a><img src="add.png"></a></li></nav>
+	<nav class="settingsNav"><li id="tab_settings"><a><img src="add.png"></a></li></nav>
+	<main>
+		<section id="getstarted">
+			<h1>&#x25C4; Click here to get started</h1>
+		</section>
+		<section id="botconfig" hidden>
+			<input type="hidden" id="botId">
+			<h1><span id="botName">name</span> <span id="botScreenName">@screenName</span></h1>
+			<hr>
+			<div>Status: <span id="botStatus">Offline</span></div>
+			<section>
+				<div>
+					<label><input type="checkbox" id="botEnabled"> Enable</label>
+				</div>
+				<div>Post every
+				<input type="number" id="botMinDelay" value="2.5" min="0.5" max="24" step="0.5" style="width:48px">
+				to
+				<input type="number" id="botMaxDelay" value="3" min="0.5" max="24" step="0.5" style="width:48px">
+				hours</div>
+				<div>
+					<label><input type="checkbox" id="botWarnOnEmpty"> Warn when queue is empty</label>
+				</div>
+			</section>
+			<hr>
+			<button type="button" id="manageQueue">Manage queue</button>
+			<button type="button" id="manageSources">Manage sources</button>
+			<button type="button" id="saveBotConfig">Save</button>
+		</section>
+		<section id="settings" hidden>
+			<h1>Settings</h1>
+		</section>
+	</main>
+</body>
