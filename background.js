@@ -250,6 +250,36 @@ function onMessage(message, sender, sendResponse)
 					}
 				});
 				break;
+			case "decommission":
+				var accounts = db.transaction(["accounts", "sources", "tweets"], "readwrite").objectStore("accounts");
+				accounts.delete(message.accountId);
+				var sources = accounts.transaction.objectStore("sources");
+				sources.index("accountId").openCursor(IDBKeyRange.only(message.accountId)).onsuccess = function (event)
+				{
+					var cursor = event.target.result;
+					if (cursor)
+					{
+						cursor.delete();
+						cursor.continue();
+					}
+				};
+				var tweets = accounts.transaction.objectStore("tweets");
+				tweets.index("accountId").openCursor(IDBKeyRange.only(message.accountId)).onsuccess = function (event)
+				{
+					var cursor = event.target.result;
+					if (cursor)
+					{
+						cursor.delete();
+						cursor.continue();
+					}
+				};
+				accounts.transaction.oncomplete = function (event) {
+					sendResponse({
+						success: true,
+						accountId: message.accountId
+					});
+				};
+				break;
 			case "getAccountList":
 				var accountList = [];
 				var accounts = db.transaction("accounts").objectStore("accounts");

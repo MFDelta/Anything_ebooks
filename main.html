@@ -118,6 +118,14 @@ dialog ul
 			<button type="submit" value="cancel">Cancel</button>
 		</form>
 	</dialog>
+	<dialog id="decommissionDialog">
+		<form id="decommissionForm" method="dialog">
+			<div>Delete this bot?</div>
+			<br>
+			<button type="submit" value="ok">OK</button>
+			<button type="submit" value="cancel">Cancel</button>
+		</form>
+	</dialog>
 	<dialog id="queueManagerDialog">
 		<form method="dialog">
 			<ul id="tweetList"></ul>
@@ -162,6 +170,7 @@ dialog ul
 			<button type="button" id="manageQueue">Manage queue</button>
 			<button type="button" id="manageSources">Manage sources</button>
 			<button type="button" id="saveBotConfig">Save</button>
+			<button type="button" id="decommission">Delete</button>
 		</section>
 		<section id="settings" hidden>
 			<h1>Settings</h1>

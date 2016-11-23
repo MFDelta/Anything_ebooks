@@ -26,6 +26,8 @@ function init()
 		}
 	});
 	
+	document.getElementById('decommission').addEventListener('click', onDecommissionClick);
+	document.getElementById('decommissionDialog').addEventListener('close', onDecommissionDialogClose);
 	document.getElementById('saveBotConfig').addEventListener('click', onSaveBotConfigClick);
 	document.getElementById('manageSources').addEventListener('click', onManageSourcesClick);
 	document.getElementById('addSource').addEventListener('click', onAddSourceClick);
@@ -118,36 +120,43 @@ function setSelectedTab(tabId)
 	{
 		tab.className = "";
 	}
-	document.querySelector("main > section:not([hidden])").hidden = true;
-	
-	tab = document.getElementById(tabId);
-	tab.className = "selected";
-	
-	switch (tabId)
+	var lastSection = document.querySelector("main > section:not([hidden])");
+	if (lastSection)
 	{
-		case 'tab_settings':
-			document.getElementById('settings').hidden = false;
-			//TODO: populate settings
-			break;
-		default:
-			chrome.runtime.sendMessage({
-				type: "getConfig",
-				accountId: tab.dataset.id
-			}, function (response)
-			{
-				document.getElementById('botId').value = tab.dataset.id;
-				document.getElementById('botName').textContent = tab.dataset.name;
-				document.getElementById('botScreenName').textContent = tab.dataset.screenName;
-				var status = (response.config.enabled ? "Online" : "Offline");
-				//TODO: give a better answer than that
-				document.getElementById('botStatus').textContent = status;
-				document.getElementById('botEnabled').checked = response.config.enabled;
-				document.getElementById('botMinDelay').value = response.config.minDelay;
-				document.getElementById('botMaxDelay').value = response.config.maxDelay;
-				document.getElementById('botWarnOnEmpty').checked = response.config.warnOnEmpty;
-				document.getElementById('botconfig').hidden = false;
-			});
-			break;
+		lastSection.hidden = true;
+	}
+	
+	if (tabId)
+	{
+		tab = document.getElementById(tabId);
+		tab.className = "selected";
+		
+		switch (tabId)
+		{
+			case 'tab_settings':
+				document.getElementById('settings').hidden = false;
+				//TODO: populate settings
+				break;
+			default:
+				chrome.runtime.sendMessage({
+					type: "getConfig",
+					accountId: tab.dataset.id
+				}, function (response)
+				{
+					document.getElementById('botId').value = tab.dataset.id;
+					document.getElementById('botName').textContent = tab.dataset.name;
+					document.getElementById('botScreenName').textContent = tab.dataset.screenName;
+					var status = (response.config.enabled ? "Online" : "Offline");
+					//TODO: give a better answer than that
+					document.getElementById('botStatus').textContent = status;
+					document.getElementById('botEnabled').checked = response.config.enabled;
+					document.getElementById('botMinDelay').value = response.config.minDelay;
+					document.getElementById('botMaxDelay').value = response.config.maxDelay;
+					document.getElementById('botWarnOnEmpty').checked = response.config.warnOnEmpty;
+					document.getElementById('botconfig').hidden = false;
+				});
+				break;
+		}
 	}
 }
 
@@ -358,6 +367,30 @@ function onTweetGeneratorDialogClose(event)
 	if (event.target.returnValue == 'continue')
 	{
 		showTweetGeneratorDialog();
+	}
+}
+
+function onDecommissionClick(event)
+{
+	document.getElementById('decommissionDialog').showModal();
+}
+
+function onDecommissionDialogClose(event)
+{
+	if (event.target.returnValue == 'ok')
+	{
+		chrome.runtime.sendMessage({
+			type: 'decommission',
+			accountId: document.getElementById('botId').value,
+		}, function (response)
+		{
+			if (response.success)
+			{
+				var tab = document.getElementById(TAB_PREFIX + response.accountId);
+				tab.parentElement.removeChild(tab);
+				setSelectedTab(null);
+			}
+		});
 	}
 }
 
