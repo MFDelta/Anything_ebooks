@@ -288,7 +288,12 @@ function addSourceToList(source)
 	var span = document.createElement('SPAN');
 	span.textContent = source.name;
 	li.appendChild(span);
-	//TODO: edit link
+	var editLink = document.createElement('A');
+	editLink.href = "#";
+	editLink.className = 'editLink';
+	editLink.textContent = "Edit";
+	editLink.addEventListener('click', onSourceEditLinkClick);
+	li.appendChild(editLink);
 	li.addEventListener('click', function (event)
 	{
 		var cb = event.currentTarget.querySelector("input");
@@ -296,6 +301,26 @@ function addSourceToList(source)
 			cb.checked = !cb.checked;
 	});
 	list.appendChild(li);
+}
+
+function onSourceEditLinkClick(event)
+{
+	var id = parseInt(event.currentTarget.parentElement.dataset.id);
+	
+	chrome.runtime.sendMessage({
+		type: 'getSource',
+		sourceId: id
+	}, function (response)
+	{
+		var form = document.getElementById('sourceEditForm');
+		form.elements.id.value = response.source.id;
+		form.elements.name.value = response.source.name;
+		form.elements.text.value = response.source.text;
+		document.getElementById('sourceEditDialog').showModal();
+	});
+	
+	event.preventDefault();
+	event.stopPropagation();
 }
 
 function onManageQueueClick(event)

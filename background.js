@@ -385,6 +385,17 @@ function onMessage(message, sender, sendResponse)
 					};
 				};
 				break;
+			case "getSource":
+				var sources = db.transaction("sources").objectStore("sources");
+				sources.get(message.sourceId).onsuccess = function (event)
+				{
+					var source = event.target.result;
+					sendResponse({
+						success: true,
+						source: source
+					});
+				};
+				break;
 			case "removeSources":
 				var accounts = db.transaction(["accounts", "sources"], "readwrite").objectStore("accounts");
 				accounts.get(message.accountId).onsuccess = function (event)
