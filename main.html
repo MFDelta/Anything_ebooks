@@ -113,10 +113,14 @@ dialog ul
 			
 		</form>
 	</dialog>
+	<dialog id="processingWindow">
+		Processing...
+	</dialog>
 	<dialog id="sourceManagerDialog">
 		<form method="dialog">
 			<ul id="sourceList"></ul>
-			<button type="button" id="addSource" tabindex="1">Add</button>
+			<button type="button" id="addSourcesFromFiles" tabindex="1">From Files</button>
+			<button type="button" id="addSource">Add</button>
 			<button type="button" id="deleteSources">Delete</button>
 			<button type="submit">Close</button>
 		</form>
@@ -127,6 +131,14 @@ dialog ul
 			<input type="text" name="name" autocomplete="off" style="width:256px">
 			<br>
 			<textarea name="text" style="width:256px;height:128px"></textarea>
+			<br>
+			<button type="submit" value="ok">OK</button>
+			<button type="submit" value="cancel">Cancel</button>
+		</form>
+	</dialog>
+	<dialog id="openFileDialog">
+		<form id="openFileForm" method="dialog">
+			<input type="file" name="file">
 			<br>
 			<button type="submit" value="ok">OK</button>
 			<button type="submit" value="cancel">Cancel</button>

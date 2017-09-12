@@ -31,12 +31,14 @@ function init()
 	document.getElementById('saveBotConfig').addEventListener('click', onSaveBotConfigClick);
 	document.getElementById('manageSources').addEventListener('click', onManageSourcesClick);
 	document.getElementById('addSource').addEventListener('click', onAddSourceClick);
+	document.getElementById('addSourcesFromFiles').addEventListener('click', onAddSourcesFromFilesClick);
 	document.getElementById('deleteSources').addEventListener('click', onDeleteSourcesClick);
 	document.getElementById('sourceEditDialog').addEventListener('close', onSourceEditDialogClose);
 	document.getElementById('manageQueue').addEventListener('click', onManageQueueClick);
 	document.getElementById('addTweets').addEventListener('click', onAddTweetsClick);
 	document.getElementById('deleteTweets').addEventListener('click', onDeleteTweetsClick);
 	document.getElementById('tweetGeneratorDialog').addEventListener('close', onTweetGeneratorDialogClose);
+	document.getElementById('openFileDialog').addEventListener('close', onOpenFileDialogClose);
 }
 
 function showLoading()
@@ -204,6 +206,64 @@ function onAddSourceClick(event)
 	document.getElementById('sourceEditDialog').showModal();
 }
 
+function onAddSourcesFromFilesClick(event)
+{
+	showOpenFileDialog(cb, ".txt", true);
+	
+	function cb(ok, files)
+	{
+		if (ok && files.length > 0)
+		{
+			showProcessing();
+			var sources = [];
+			var index = 0;
+			var reader = new FileReader();
+			var currentSource;
+			
+			reader.addEventListener('loadend', onReadComplete);
+			processNext();
+			
+			function processNext()
+			{
+				var file = files[index];
+				currentSource = {name: file.name.substring(0, file.name.lastIndexOf("."))};
+				reader.readAsText(file);
+			}
+			
+			function onReadComplete()
+			{
+				currentSource.text = reader.result;
+				sources.push(currentSource);
+				++index;
+				if (index < files.length)
+				{
+					processNext();
+				}
+				else
+				{
+					chrome.runtime.sendMessage({
+						type: 'addSources',
+						accountId: document.getElementById('botId').value,
+						sources: sources
+					}, function (response)
+					{
+						for (var source of response.sources)
+						{
+							addSourceToList(source);
+						}
+						hideProcessing();
+						var smd = document.getElementById('sourceManagerDialog');
+						smd.close()
+						smd.showModal();
+						var list = document.getElementById('sourceList');
+						list.scrollIntoView(list.lastElementChild);
+					});
+				}
+			}
+		}
+	}
+}
+
 function onDeleteSourcesClick(event)
 {
 	var list = document.getElementById('sourceList');
@@ -232,6 +292,31 @@ function onDeleteSourcesClick(event)
 			smd.close()
 			smd.showModal();
 		});
+	}
+}
+
+var openFileDialogCallback;
+
+function showOpenFileDialog(callback, filter, allowMultiple)
+{
+	var form = document.getElementById('openFileForm');
+	form.reset();
+	form.elements.file.accept = filter || "";
+	form.elements.file.multiple = allowMultiple || false;
+	openFileDialogCallback = callback;
+	document.getElementById('openFileDialog').showModal();
+}
+
+function onOpenFileDialogClose(event)
+{
+	var form = document.getElementById('openFileForm');
+	if (event.target.returnValue == 'ok')
+	{
+		openFileDialogCallback(true, form.elements.file.files);
+	}
+	else
+	{
+		openFileDialogCallback(false);
 	}
 }
 
@@ -489,6 +574,16 @@ function addGeneratedTweetToList(tweet)
 		
 	});
 	list.appendChild(li);
+}
+
+function showProcessing()
+{
+	document.getElementById('processingWindow').showModal();
+}
+
+function hideProcessing()
+{
+	document.getElementById('processingWindow').close();
 }
 
 chrome.runtime.onMessage.addListener(onMessage);

@@ -154,6 +154,7 @@ function init()
 	});
 }
 
+
 function onMessage(message, sender, sendResponse)
 {
 	console.log(message);
